@@ -15,19 +15,30 @@ class MLFoundationClient:
         auth_header = {"Authorization" : "Bearer " + r.json()["access_token"]}
         return auth_header
 
+    # these details should be plugged in MinIO for the data upload and training part
+    def get_data_endpoint(self):
+        url = "{}/api/v2/image/retraining/storage".format(
+                self.skey["serviceurls"]["JOB_SUBMISSION_API_URL"])
+        print (url)
+        r = requests.get(url, headers = self.auth_header)
+        return r.json()
+
     # this runs the custom deployed model. upload an image and get back the prediction results
     def model_predict(self, image_path, model_name, version = 1):
-        url = "{}/models/{}/versions/{}".format(self.skey["serviceurls"]["IMAGE_CLASSIFICATION_URL"],
-                                               model_name, version)
+        url = "{}/models/{}/versions/{}".format(
+                self.skey["serviceurls"]["IMAGE_CLASSIFICATION_URL"],
+                model_name, version)
         files = {'files' : open(image_path, 'rb')}
         r = requests.post(url, files = files, headers = self.auth_header)
         return r.json()
 
+    # list all trained models
     def model_list(self):
         url = "{}/models".format(self.skey["serviceurls"]["IMAGE_RETRAIN_API_URL"])
         r = requests.get(url, headers = self.auth_header)
         return r.json()
 
+    # list only deployed models
     def model_list_deployed(self):
         url = "{}/deployments".format(self.skey["serviceurls"]["IMAGE_RETRAIN_API_URL"])
         r = requests.get(url, headers = self.auth_header)
