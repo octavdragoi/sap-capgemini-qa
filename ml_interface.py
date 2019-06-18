@@ -7,6 +7,8 @@ class MLFoundationClient:
         self.skey = skey
         self.auth_header = self.authenticate(skey)
 
+    # authentication gets the Bearer token. this runs automatically on init
+    # so that future callbacks work as well
     def authenticate(self, skey):
         auth_url = "{}/oauth/token?grant_type=client_credentials".format(skey["url"])
         r = requests.get(auth_url, auth = (skey["clientid"], skey["clientsecret"]))
@@ -19,7 +21,6 @@ class MLFoundationClient:
     def get_data_endpoint(self):
         url = "{}/api/v2/image/retraining/storage".format(
                 self.skey["serviceurls"]["JOB_SUBMISSION_API_URL"])
-        print (url)
         r = requests.get(url, headers = self.auth_header)
         return r.json()
 
