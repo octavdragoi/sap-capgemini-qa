@@ -23,6 +23,11 @@ class MLFoundationClient:
         r = requests.post(url, files = files, headers = self.auth_header)
         return r.json()
 
+    def model_list(self):
+        url = "{}/models".format(self.skey["serviceurls"]["IMAGE_RETRAIN_API_URL"])
+        r = requests.get(url, headers = self.auth_header)
+        return r.json()
+
     def model_list_deployed(self):
         url = "{}/deployments".format(self.skey["serviceurls"]["IMAGE_RETRAIN_API_URL"])
         r = requests.get(url, headers = self.auth_header)
