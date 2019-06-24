@@ -35,77 +35,75 @@ class MLFoundationClient:
         return r.json()
     
     #pass through all models
-    def model_predict_all(self, image_path):
+    def model_predict_all(self, image_path, image):
         img= self.imageClassified(image_path)
+       
         
         #WrongObjectModel
-        wrongObject = self.model_predict(image_path,"WrongObjectModel")
+        wrongObject = self.model_predict(image,"WrongObjectModel")
         if (wrongObject["predictions"][0]["results"][0]["label"]=="right_object"):
             img.wrongObject_score = wrongObject["predictions"][0]["results"][0]["score"]
         else:
             img.wrongObject_score = wrongObject["predictions"][0]["results"][1]["score"]
         if (img.wrongObject_score >0.5):
-            img.wrongObject = 0
+            img.defects = []
         else:
-            img.wrongObject = 1
+            img.defects = ["Wrong Object"]
         
         
         #WrongObject means it does not go through the other models
-        if (img.wrongObject ==0):  
+        if (not img.defects):  
             #HoleModel
-            hole = self.model_predict(image_path,"HoleModel")
+            hole = self.model_predict(image,"HoleModel")
             if (hole["predictions"][0]["results"][0]["label"]=="hole"):
                 img.hole_score = hole["predictions"][0]["results"][0]["score"]
             else:
                 img.hole_score = hole["predictions"][0]["results"][1]["score"]
             if (img.hole_score >0.5):
-                img.hole = 1
-            else:
-                img.hole = 0
+                img.defects.append("Hole")
+
             #DentModel
-            dent = self.model_predict(image_path,"DentModel")
+            dent = self.model_predict(image,"DentModel")
             if (dent["predictions"][0]["results"][0]["label"]=="dent"):
                 img.dent_score = dent["predictions"][0]["results"][0]["score"]
             else:
                 img.dent_score = dent["predictions"][0]["results"][1]["score"]
             if (img.dent_score >0.5):
-                img.dent = 1
-            else:
-                img.dent = 0
+                img.defects.append("Dent")
+
+            
+            
             #StainModel
-            stain = self.model_predict(image_path,"StainModel")
+            stain = self.model_predict(image,"StainModel")
             if (stain["predictions"][0]["results"][0]["label"]=="stain"):
                 img.stain_score = stain["predictions"][0]["results"][0]["score"]
             else:
                 img.stain_score = stain["predictions"][0]["results"][1]["score"]
-            if (img.stain_score >0.5):
-                img.stain = 1
-            else:
-                img.stain = 0
+            if (img.stain_score >0.5):    
+                img.defects.append("Stain")
+
 
             #ScratchModel
-            scratch = self.model_predict(image_path,"ScratchModel")
+            scratch = self.model_predict(image,"ScratchModel")
             if (scratch["predictions"][0]["results"][0]["label"]=="scratch"):
                 img.scratch_score = scratch["predictions"][0]["results"][0]["score"]
             else:
                 img.scratch_score = scratch["predictions"][0]["results"][1]["score"]
             if (img.scratch_score >0.5):
-                img.scratch = 1
-            else:
-                img.scratch = 0
-        else:
-            img.scratch = 0
-            img.dent = 0
-            img.hole = 0
-            img.stain = 0
-            img.scratch_score = 0
-            img.dent_score = 0
-            img.hole_score = 0
-            img.stain_score = 0
+                img.defects.append("Scratch")
         
         return img
-        
+    
+    #predicts 2 images
 
+    def predictPair(self, path1, image1, path2, image2):
+        img1= self.model_predict_all(path1,image1)
+        img2= self.model_predict_all(path2,image2)
+        
+        pair= self.pairOfImages(img1,img2)
+        return pair.convertToJSON()
+        
+        
     # list all trained models
     def model_list(self):
         url = "{}/models".format(self.skey["serviceurls"]["IMAGE_RETRAIN_API_URL"])
@@ -118,22 +116,32 @@ class MLFoundationClient:
         r = requests.get(url, headers = self.auth_header)
         return r.json()
     
+    
+    
+    #Class of 1 Image
     class imageClassified:
         def __init__(self, image_path):
             self.image_path = image_path
+    
+    #Pair of Images that convert into JSON
+    class pairOfImages:
+        
+        def __init__(self, image1, image2):
+            self.image1=image1
+            self.image2=image2
         
         def convertToJSON(self):
-            if (self.stain + self.scratch + self.hole+ self.wrongObject + self.dent == 0):
-                fine = 1
-            else:
-                fine = 0
             x = {
-                "path": self.image_path,
-                "WrongObject" : self.wrongObject,
-                "Hole" : self.hole,
-                "Dent" : self.dent,
-                "Stain": self.stain,
-                "Scrach": self.scratch      
+                "image1":{
+                    "path" : self.image1.image_path,
+                    "defects" : self.image1.defects
+                },
+                "image2":{
+                    "path" : self.image2.image_path,
+                    "defects" : self.image2.defects
+                }
+                
             }
             return json.dumps(x)
+
 
