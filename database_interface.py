@@ -58,7 +58,7 @@ class DBClient:
 
 	"""
 	Interface to insert info of the product. Note that the date must be in the format 2019-06-20T17:49:12.536Z
-	Returns the service response
+	Returns the service response and the newly generated product ID
 	"""
 	def insertProduct(self, capture_date, factoryID=randint(0,3)):
 		access_point = '{base_service}/{end_point}'.format(base_service=URL_SERVICE,end_point=PRODUCT_END_POINT)
@@ -78,7 +78,7 @@ class DBClient:
 		if r.status_code!=201:
 			print(r.json())
 			raise RuntimeError("Error in Webservice")
-		return r.json()
+		return r.json(), ID
 
 	"""
 	Interface to insert info of the image.
@@ -144,11 +144,11 @@ class DBClient:
 			#Here change to the model tested
 			defectID = DEFECTS_CODE['Wrong Product']
 
-			newProduct = self.insertProduct(date)
+			newProduct, newProductID = self.insertProduct(date)
 
-			newImage = self.insertImage(productID=newProduct['d']['ID'],image_storage_path=imageStoragePath)
+			newImage = self.insertImage(productID=newProductID,image_storage_path=imageStoragePath)
 
-			newProdDefRel = self.insertProductsDefects(productID=newProduct['d']['ID'], defectID=defectID)
+			newProdDefRel = self.insertProductsDefects(productID=newProductID, defectID=defectID)
 
 			print("New register inserted succesfully")
 			return True

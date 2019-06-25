@@ -19,14 +19,14 @@ class MLFoundationClient:
         return auth_header
 
     # these details should be plugged in MinIO for the data upload and training part
-    def get_data_endpoint(self):
+    def getDataEndpoint(self):
         url = "{}/api/v2/image/retraining/storage".format(
                 self.skey["serviceurls"]["JOB_SUBMISSION_API_URL"])
         r = requests.get(url, headers = self.auth_header)
         return r.json()
 
     # this runs the custom deployed model. upload an image and get back the prediction results
-    def model_predict(self, image_path, model_name, version = 1):
+    def modelPredict(self, image_path, model_name, version = 1):
         url = "{}/models/{}/versions/{}".format(
                 self.skey["serviceurls"]["IMAGE_CLASSIFICATION_URL"],
                 model_name, version)
@@ -35,12 +35,12 @@ class MLFoundationClient:
         return r.json()
     
     #pass through all models
-    def model_predict_all(self, image_path, image):
+    def modelPredictAll(self, image_path, image):
         img= self.imageClassified(image_path)
        
         
         #WrongObjectModel
-        wrongObject = self.model_predict(image,"WrongObjectModel")
+        wrongObject = self.modelPredict(image,"WrongObjectModel")
         if (wrongObject["predictions"][0]["results"][0]["label"]=="right_object"):
             img.wrongObject_score = wrongObject["predictions"][0]["results"][0]["score"]
         else:
@@ -54,7 +54,7 @@ class MLFoundationClient:
         #WrongObject means it does not go through the other models
         if (not img.defects):  
             #HoleModel
-            hole = self.model_predict(image,"HoleModel")
+            hole = self.modelPredict(image,"HoleModel")
             if (hole["predictions"][0]["results"][0]["label"]=="hole"):
                 img.hole_score = hole["predictions"][0]["results"][0]["score"]
             else:
@@ -63,7 +63,7 @@ class MLFoundationClient:
                 img.defects.append("Hole")
 
             #DentModel
-            dent = self.model_predict(image,"DentModel")
+            dent = self.modelPredict(image,"DentModel")
             if (dent["predictions"][0]["results"][0]["label"]=="dent"):
                 img.dent_score = dent["predictions"][0]["results"][0]["score"]
             else:
@@ -74,7 +74,7 @@ class MLFoundationClient:
             
             
             #StainModel
-            stain = self.model_predict(image,"StainModel")
+            stain = self.modelPredict(image,"StainModel")
             if (stain["predictions"][0]["results"][0]["label"]=="stain"):
                 img.stain_score = stain["predictions"][0]["results"][0]["score"]
             else:
@@ -84,7 +84,7 @@ class MLFoundationClient:
 
 
             #ScratchModel
-            scratch = self.model_predict(image,"ScratchModel")
+            scratch = self.modelPredict(image,"ScratchModel")
             if (scratch["predictions"][0]["results"][0]["label"]=="scratch"):
                 img.scratch_score = scratch["predictions"][0]["results"][0]["score"]
             else:
@@ -97,21 +97,21 @@ class MLFoundationClient:
     #predicts 2 images
 
     def predictPair(self, path1, image1, path2, image2):
-        img1= self.model_predict_all(path1,image1)
-        img2= self.model_predict_all(path2,image2)
+        img1= self.modelPredictAll(path1,image1)
+        img2= self.modelPredictAll(path2,image2)
         
         pair= self.pairOfImages(img1,img2)
         return pair.convertToJSON()
         
         
     # list all trained models
-    def model_list(self):
+    def modelList(self):
         url = "{}/models".format(self.skey["serviceurls"]["IMAGE_RETRAIN_API_URL"])
         r = requests.get(url, headers = self.auth_header)
         return r.json()
 
     # list only deployed models
-    def model_list_deployed(self):
+    def modelListDeployed(self):
         url = "{}/deployments".format(self.skey["serviceurls"]["IMAGE_RETRAIN_API_URL"])
         r = requests.get(url, headers = self.auth_header)
         return r.json()
