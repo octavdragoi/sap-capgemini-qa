@@ -4,9 +4,11 @@ import json
 
 # class automatically authorizes, on init
 class MLFoundationClient:
-    def __init__(self, skey):
+    def __init__(self, skey, offline = False):
         self.skey = skey
-        self.auth_header = self.authenticate(skey)
+        self.offline = offline
+        if not self.offline:
+            self.auth_header = self.authenticate(skey)
 
     # authentication gets the Bearer token. this runs automatically on init
     # so that future callbacks work as well
@@ -14,6 +16,7 @@ class MLFoundationClient:
         auth_url = "{}/oauth/token?grant_type=client_credentials".format(skey["url"])
         r = requests.get(auth_url, auth = (skey["clientid"], skey["clientsecret"]))
         if r.status_code != 200:
+            print (r.json())
             raise RuntimeError("Authentication failed!")
         auth_header = {"Authorization" : "Bearer " + r.json()["access_token"]}
         return auth_header
@@ -44,7 +47,8 @@ class MLFoundationClient:
     #pass through all models
     def modelPredictAll(self, image):
         img=[]
-       
+        if self.offline:
+            return img
         
         #WrongObjectModel
         wrongObject = self.modelPredict(image,"WrongObjectModel")
