@@ -6,11 +6,11 @@ from enum import Enum
 
 class DefectCode(Enum):
     NoDefect=0
-	WrongProduct=1
-	Scratch= 2
-	Dent=3
-	Stain= 4
-	Hole=5
+    WrongProduct=1
+    Scratch= 2
+    Dent=3
+    Stain= 4
+    Hole=5
 
 # class automatically authorizes, on init
 class MLFoundationClient:
