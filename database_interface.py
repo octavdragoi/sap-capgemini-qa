@@ -22,15 +22,6 @@ PRODUCT_DEFECT_END_POINT = 'Products_Defects'
 
 # Feel free to modify the key texts to the ones you use in the ML service
 
-DEFECTS_CODE ={
-	
-	'No Defect':0,
-	'Wrong Product':1,
-	'Scratch': 2,
-	'Dent': 3,
-	'Stain': 4,
-	'Hole': 5
-}
 
 # Headers to set the response as a json format
 DEFAULT_HEADERS={"Content-Type":"application/json", "Accept":"application/json"}
@@ -130,33 +121,39 @@ class DBClient:
 			raise RuntimeError("Error in Webservice")
 		return r.json()
 
+    
 	"""
 	Interface to insert info of the product and defect relationship.
 	Returns the service response
 	"""
 	def saveMachineLearningResult(self, imageInfo, productExists=False):
+        try:
+            date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+            
+            newProduct, newProductID = self.insertProduct(date)
+            
+            imageStoragePath1 = imageInfo['image1']
 
-		try: 
-			date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+            imageStoragePath2 = imageInfo['image2']
 
-			imageStoragePath ="Here you add the storage path"
+            self.insertImage(productID=newProductID,image_storage_path=imageStoragePath1)
+            self.insertImage(productID=newProductID,image_storage_path=imageStoragePath2)
+            
+            #Here change to the model tested
+            
+            if not imageInfo['defects']:
+                newProdDefRel = self.insertProductsDefects(productID=newProductID, defectID=0)
+            else:
+                for defect in imageInfo['defects']:
+                    defectID = defect.value
+                    newProdDefRel = self.insertProductsDefects(productID=newProductID, defectID=defectID)
 
-			#Here change to the model tested
-			defectID = DEFECTS_CODE['Wrong Product']
-
-			newProduct, newProductID = self.insertProduct(date)
-
-			newImage = self.insertImage(productID=newProductID,image_storage_path=imageStoragePath)
-
-			newProdDefRel = self.insertProductsDefects(productID=newProductID, defectID=defectID)
-
-			print("New register inserted succesfully")
-			return True
-			
-
-		except RuntimeError:
-			print(RuntimeError)
-			return False
+            print("New register inserted succesfully")
+            return True
+        except RuntimeError:
+            print("Register Insertion has failed")
+            
+            return False
 
 
 
