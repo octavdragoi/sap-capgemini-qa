@@ -1,6 +1,16 @@
 # test custom deployed model
 import requests
 import json
+from enum import Enum
+
+
+class DefectCode(Enum):
+    NoDefect=0
+	WrongProduct=1
+	Scratch= 2
+	Dent=3
+	Stain= 4
+	Hole=5
 
 # class automatically authorizes, on init
 class MLFoundationClient:
@@ -50,7 +60,7 @@ class MLFoundationClient:
         wrongObject = self.modelPredict(image,"WrongObjectModel")
         wrongObjectScore = self.parseResult(wrongObject,"wrong_object")
         if ( wrongObjectScore > 0.5 ):
-            img.append("Wrong Object")
+            img.append(DefectCode.WrongProduct)
     
         #WrongObject means it does not go through the other models
         if (not img):  
@@ -58,26 +68,26 @@ class MLFoundationClient:
             hole = self.modelPredict(image,"HoleModel")
             holeScore = self.parseResult(hole, "hole")
             if (holeScore >0.5):
-                img.append("Hole")
+                img.append(DefectCode.Hole)
 
             #DentModel
             dent = self.modelPredict(image,"DentModel")
             dentScore = self.parseResult(dent,"dent")
             if (dentScore >0.5):
-                img.append("Dent")
+                img.append(DefectCode.Dent)
 
                         
             #StainModel
             stain = self.modelPredict(image,"StainModel")
             stainScore = self.parseResult(stain,"stain")
             if (stainScore >0.5):    
-                img.append("Stain")
+                img.append(DefectCode.Stain)
 
             #ScratchModel
             scratch = self.modelPredict(image,"ScratchModel")
             scratchScore = self.parseResult(scratch, "scratch")
             if (scratchScore >0.5):
-                img.append("Scratch")
+                img.append(DefectCode.Scratch)
         
         return img
     
