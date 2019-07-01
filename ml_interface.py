@@ -54,6 +54,24 @@ class MLFoundationClient:
         else:
             return json["predictions"][0]["results"][1]["score"]
     
+    
+    
+    #pass through one model and parse result
+    
+    def modelPredictOne(self, image, label, model, enum):
+        defects = []
+        if self.offline:
+            return defects
+        json = self.modelPredict(image,model)
+        jsonScore = self.parseResult(json,label)        
+        
+        if ( jsonScore > 0.5 ):
+            defects.append(enum)
+        return defects
+
+        
+        
+        
     #pass through all models
     def modelPredictAll(self, image):
         img=[]
