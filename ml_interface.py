@@ -26,7 +26,7 @@ class MLFoundationClient:
         auth_url = "{}/oauth/token?grant_type=client_credentials".format(skey["url"])
         r = requests.get(auth_url, auth = (skey["clientid"], skey["clientsecret"]))
         if r.status_code != 200:
-            print (r.json())
+            print (r.text)
             raise RuntimeError("Authentication failed!")
         auth_header = {"Authorization" : "Bearer " + r.json()["access_token"]}
         return auth_header
@@ -49,6 +49,7 @@ class MLFoundationClient:
     
     #parses the Result from a json
     def parseResult(self,json,label):
+        print (json)
         if (json["predictions"][0]["results"][0]["label"]==label):
             return json["predictions"][0]["results"][0]["score"]
         else:
