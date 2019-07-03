@@ -15,6 +15,11 @@ APPROVED_EXTENSIONS = [".jpg", ".jpeg"]
 STANDARD_IMG_SIZE = (1440, 1920)
 
 def resize_image(img_path):
+    """"
+    This function checks if the image is of the right size, and if not, it resizes
+    it. It also overwrites the original picture, so make sure you have a backup
+    somewhere else!
+    """
     img = Image.open(img_path)
     if img.size != STANDARD_IMG_SIZE:
         print ("Image size {} differs from standard {}, resizing...".format(
@@ -83,5 +88,6 @@ if __name__ == "__main__":
         if len(new_files) >= 2:
             process_images(new_files[0], new_files[1])
             files += new_files[:2]
+        else:
+            time.sleep(SLEEPTIME)
         print (new_files)
-        time.sleep(SLEEPTIME)
