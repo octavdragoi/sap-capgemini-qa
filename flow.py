@@ -7,10 +7,20 @@ from image_interface import ImageDBClient
 import os
 import sys
 import time
+from PIL import Image
 
 # parameters for the global script
 SLEEPTIME = 2 # seconds
 APPROVED_EXTENSIONS = [".jpg", ".jpeg"]
+STANDARD_IMG_SIZE = (1440, 1920)
+
+def resize_image(img_path):
+    img = Image.open(img_path)
+    if img.size != STANDARD_IMG_SIZE:
+        print ("Image size {} differs from standard {}, resizing...".format(
+            img.size, STANDARD_IMG_SIZE))
+        img.thumbnail(STANDARD_IMG_SIZE, Image.ANTIALIAS)
+        img.save(img_path, "JPEG")
 
 def process_image_ml(img_path):
     defectWrongObject = clientWrongObject.modelPredictOne(
@@ -19,13 +29,17 @@ def process_image_ml(img_path):
             img_path, "hole","HoleModel", DefectCode.Hole)
     defectScratch = clientScratch.modelPredictOne(
             img_path, "scratch","ScratchModel", DefectCode.Scratch)
-    return [defectWrongObject, defectHole, defectScratch]
-
+    defects = [defectWrongObject, defectHole, defectScratch]
+    return [x[0] for x in defects if len(x) > 0]
 
 def process_images(img_path, img_path2):
     # open the images
     # img = open(img_path, "rb")
     # img2 = open(img_path2, "rb")
+
+    # resize images
+    resize_image(img_path)
+    resize_image(img_path2)
 
     # get the keys for the image uploading
     key = im_client.upload(img_path)
@@ -34,7 +48,7 @@ def process_images(img_path, img_path2):
     # call the ML models
     defects_lst = process_image_ml(img_path)
     defects_lst2 = process_image_ml(img_path2)
-    defects = set(defects_lst + defects_lst2)
+    defects = list(set(defects_lst + defects_lst2))
 
     #make the json
     imageInfo= {
@@ -56,7 +70,10 @@ clientScratch = MLFoundationClient(ml_servicekey_scratch)
 
 if __name__ == "__main__":
     """
-    start the main program loop
+    Start the main program loop.
+    Run in terminal as "./flow.py <input_dir>".
+    The script will watch over the directory, and when it sees two new images
+    it will run the whole algorithm.
     """
     files = []
     while 1:
