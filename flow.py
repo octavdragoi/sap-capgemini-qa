@@ -63,7 +63,7 @@ def process_images(img_path, img_path2):
     }
     print(imageInfo)
 
-    db_client.saveMachineLearningResult(imageInfo, productExists=False)
+    db_client.saveMachineLearningResult(imageInfo)
 
 
 db_client = DBClient()

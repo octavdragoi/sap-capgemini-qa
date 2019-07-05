@@ -4,7 +4,7 @@ import urllib.parse
 import datetime
 
 #Change this to the Access point that we are going to use in Production
-URL_SERVICE = 'https://kkzqqs6qiqbstcyhinspection-ba-srv.cfapps.eu10.hana.ondemand.com/odata/v2/DatabaseServices'
+URL_SERVICE = 'https://cdce0agbccyiq5whspection-ba-1-srv.cfapps.eu10.hana.ondemand.com/odata/v2/DatabaseServices'
 
 # Entry Points for tables
 PRODUCT_END_POINT = 'Products'
@@ -118,7 +118,7 @@ class DBClient:
     Interface to insert info of the product and defect relationship.
     Returns the service response
     """
-    def saveMachineLearningResult(self, imageInfo, productExists=False):
+    def saveMachineLearningResult(self, imageInfo):
         try:
             date = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
             
