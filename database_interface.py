@@ -4,7 +4,7 @@ import urllib.parse
 import datetime
 
 #Change this to the Access point that we are going to use in Production
-URL_SERVICE = 'https://n05107dk57gmggloinspection-ba-srv.cfapps.eu10.hana.ondemand.com/odata/v2/DatabaseServices'
+URL_SERVICE = 'https://IKVr2IXVI4ikBiNeinspection-ba-srv.cfapps.eu10.hana.ondemand.com/odata/v2/DatabaseServices'
 
 # Entry Points for tables
 PRODUCT_END_POINT = 'Products'
