@@ -89,7 +89,9 @@ if __name__ == "__main__":
         new_files = [x for x in curr_files if x not in files and
                      any([x.endswith(ext) for ext in APPROVED_EXTENSIONS])]
         if len(new_files) >= 2:
-            process_images(new_files[0], new_files[1])
+            process_images(
+                    os.path.join(sys.argv[1], new_files[0]), 
+                    os.path.join(sys.argv[1], new_files[1]))
             files += new_files[:2]
         else:
             time.sleep(SLEEPTIME)
