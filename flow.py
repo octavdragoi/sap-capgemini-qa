@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from keys import ml_servicekey_wrongobject, ml_servicekey_hole, ml_servicekey_scratch
+from keys import ml_servicekey_wrongobject, ml_servicekey_hole, ml_servicekey_dent
 from ml_interface import MLFoundationClient, DefectCode
 from database_interface import DBClient
 from image_interface import ImageDBClient
@@ -33,9 +33,9 @@ def process_image_ml(img_path):
     if (not defectWrongObject):
         defectHole = clientHole.modelPredictOne(
                 img_path, "hole","HoleModel", DefectCode.Hole)
-        defectScratch = clientScratch.modelPredictOne(
-                img_path, "scratch","ScratchModel", DefectCode.Scratch)
-        defects = [defectWrongObject, defectHole, defectScratch]
+        defectDent = clientDent.modelPredictOne(
+                img_path, "dent","DentModel", DefectCode.Dent)
+        defects = [defectWrongObject, defectHole, defectDent]
     else:
         defects = [defectWrongObject]
     return [x[0] for x in defects if len(x) > 0]
@@ -74,7 +74,7 @@ db_client = DBClient()
 im_client = ImageDBClient()
 clientWrongObject = MLFoundationClient(ml_servicekey_wrongobject)
 clientHole = MLFoundationClient(ml_servicekey_hole)
-clientScratch = MLFoundationClient(ml_servicekey_scratch)
+clientDent = MLFoundationClient(ml_servicekey_dent)
 
 if __name__ == "__main__":
     """
