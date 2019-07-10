@@ -30,11 +30,14 @@ def resize_image(img_path):
 def process_image_ml(img_path):
     defectWrongObject = clientWrongObject.modelPredictOne(
             img_path, "wrong_object","WrongObjectModel", DefectCode.WrongProduct)
-    defectHole = clientHole.modelPredictOne(
-            img_path, "hole","HoleModel", DefectCode.Hole)
-    defectScratch = clientScratch.modelPredictOne(
-            img_path, "scratch","ScratchModel", DefectCode.Scratch)
-    defects = [defectWrongObject, defectHole, defectScratch]
+    if (not defectWrongObject):
+        defectHole = clientHole.modelPredictOne(
+                img_path, "hole","HoleModel", DefectCode.Hole)
+        defectScratch = clientScratch.modelPredictOne(
+                img_path, "scratch","ScratchModel", DefectCode.Scratch)
+        defects = [defectWrongObject, defectHole, defectScratch]
+    else:
+        defects = [defectWrongObject]
     return [x[0] for x in defects if len(x) > 0]
 
 def process_images(img_path, img_path2):
