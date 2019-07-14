@@ -68,6 +68,11 @@ def process_images(img_path, img_path2):
 
     db_client.saveMachineLearningResult(imageInfo)
 
+    # remove the files after upload
+    os.remove(img_path)
+    os.remove(img_path2)
+
+
 
 db_client = DBClient()
 #ml_client = MLFoundationClient(ml_key, offline = True)
@@ -90,7 +95,7 @@ if __name__ == "__main__":
                      any([x.endswith(ext) for ext in APPROVED_EXTENSIONS])]
         if len(new_files) >= 2:
             process_images(
-                    os.path.join(sys.argv[1], new_files[0]), 
+                    os.path.join(sys.argv[1], new_files[0]),
                     os.path.join(sys.argv[1], new_files[1]))
             files += new_files[:2]
         else:

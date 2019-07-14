@@ -47,7 +47,7 @@ class DBClient:
     2019-06-20T17:49:12.536Z
     Returns the service response and the newly generated product ID
     """
-    def insertProduct(self, capture_date, factoryID=randint(0,3)):
+    def insertProduct(self, capture_date, factoryID=randint(1,3)):
         access_point = '{base_service}/{end_point}'.format(
                 base_service=URL_SERVICE,end_point=PRODUCT_END_POINT)
         r = requests.get(access_point, headers=DEFAULT_HEADERS, params=PARAMS_MAX_ID)
@@ -134,10 +134,11 @@ class DBClient:
             #Here change to the model tested
             
             if not imageInfo['defects']:
-                newProdDefRel = self.insertProductsDefects(productID=newProductID, defectID=0)
+                newProdDefRel = self.insertProductsDefects(productID=newProductID, defectID=6)
             else:
                 for defect in imageInfo['defects']:
                     defectID = defect.value
+                    print (defectID)
                     newProdDefRel = self.insertProductsDefects(productID=newProductID, defectID=defectID)
 
             print("New register inserted succesfully")
